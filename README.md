@@ -6,9 +6,9 @@ $k(x) > 0$ - коэффициент теплопроводности в сече
 $q(x) \ge 0$ - коэффициент теплообмена с окружающей средой через  боковую поверхность в сечении с координатой $x$  
 $f(x)$ - плотность источников (стоков тепла) в сечении с координатой $x$  
 ### Вводимые аргументы:
-$$\large \varphi_i = \frac{1}{h} \int_{x_{i-\frac{1}{2}}}^{x_{i+\frac{1}{2}}} f(x) \, dx, \quad i = \overline{1, n-1}$$
-$$\large d_i = \frac{1}{h} \int_{x_{i-\frac{1}{2}}}^{x_{i+\frac{1}{2}}} q(x) \, dx, \quad i = \overline{1, n-1}$$
-$$\large a_i = [\frac{1}{h} \int_{x_{i-1}}^{x_{i}} \frac{dx}{k(x)} \, ]^{-1}, \quad i = \overline{1, n-1}$$
+$$\large \varphi_i = \frac{1}{h} \int_{x_{i-\frac{1}{2}}}^{x_{i+\frac{1}{2}}} f(x) \, dx, \quad i = \overline{{1,n-1}}$$
+$$\large d_i = \frac{1}{h} \int_{x_{i-\frac{1}{2}}}^{x_{i+\frac{1}{2}}} q(x) \, dx, \quad i = \overline{{1,n-1}}$$
+$$\large a_i = [\frac{1}{h} \int_{x_{i-1}}^{x_{i}} \frac{dx}{k(x)} \, ]^{-1}, \quad i = \overline{{1,n-1}}$$
 
 ---
 ## Инструкция по сборке
