@@ -13,7 +13,7 @@ $$\large a_i = [\frac{1}{h} \int_{x_{i-1}}^{x_{i}} \frac{dx}{k(x)} \, ]^{-1}, \q
 $$ \large
 \begin{cases}
 V_o = \mu_0\\
-a_{i+1}\frac{V_{i+1} - V_{i}}{h^2} - a_i \frac{V_i - V_{i-1}}{h^2} - d_i V_i = -\varphi_i\\
+a_{i+1}\frac{V_{i+1} - V_{i}}{h^2} - a_i \frac{V_i - V_{i-1}}{h^2} - d_i V_i = -\varphi_i, \quad i = 1,n-1\\
 V_n = \mu_n
 \end{cases}
 $$
