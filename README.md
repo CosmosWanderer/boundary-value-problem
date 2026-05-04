@@ -25,7 +25,7 @@ $$
 $$ \large 
 \begin{cases}
 V_0 = \mu_1\\
-\frac{a_i}{h^2} V_{i-1} - (\frac{a_i + a_{i+1}}{h^2} + d_i)V_i + \frac{a_{i+1}}{h^2}V_{i+1} = -\varphi_i, \quad i=1,n-1\\
+\frac{a_i}{h^2} V_{i-1} - \left(\frac{a_i + a_{i+1}}{h^2} + d_i\right)V_i + \frac{a_{i+1}}{h^2}V_{i+1} = -\varphi_i, \quad i=1,n-1\\
 V_n = \mu_2
 \end{cases}
 $$
@@ -34,7 +34,7 @@ $\large A_i = \frac{a_i}{h^2}$
 $\large C_i = \frac{a_i + a_{i+1}}{h^2} + d_i$  
 $\large B_i = \frac{a_{i+1}}{h^2}$  
 Система для метода прогонки:  
-$$ \large 
+$$ 
 \begin{cases}
 V_0 = \mu_1\\
 A_i V_{i-1} - C_i V_i + B_i V_{i+1} = -\varphi_i, \quad i=1,n-1\\
