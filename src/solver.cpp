@@ -1,0 +1,110 @@
+#include "solver.h"
+#include <cmath>
+#include <numbers>
+
+// Main task, var 4
+double Solver::k1(double x) {
+    return (x + 1) * (x + 1);
+}
+double Solver::k2(double x) {
+    return x * x;
+}
+double Solver::q1(double x) {
+    return exp(-x) * sqrt(exp(1.0));
+}
+double Solver::q2(double x) {
+    return exp(x) / sqrt(exp(1.0));
+}
+double Solver::f1(double x) {
+    return cos(x * M_PI);
+}
+double Solver::f2(double x) {
+    return 1;
+}
+
+// Get coords
+double Solver::get_x(unsigned i) {
+    return i * h;
+}
+double Solver::get_half_step_minus(unsigned i) {
+    return (i - 0.5) * h; 
+}
+double Solver::get_half_step_plus(unsigned i) {
+    return (i + 0.5) * h; 
+}
+  
+// Rectangle method
+double Solver::find_a_rect(unsigned i) {
+    if (get_x(i) <= ksi) {
+        return k1(get_half_step_minus(i));
+    }
+    if (get_x(i - 1) >= ksi) {
+        return k2(get_half_step_minus(i));
+    }
+    
+    double sl1 = (ksi - get_x(i-1)) / (k1((get_x(i-1) + ksi) / 2));
+    double sl2 = (get_x(i) - ksi) / (k2((get_x(i) + ksi) / 2));
+    return sl1 + sl2;
+
+}
+double Solver::find_d_rect(unsigned i) {
+    if (ksi >= get_half_step_plus(i)) {
+        return q1(get_x(i));
+    }
+    if (ksi <= get_half_step_minus(i)) {
+        return q2(get_x(i));
+    }
+
+    double sl1 = (1 / h) * q1((ksi + get_half_step_minus(i)) / 2) * (ksi - get_half_step_minus(i));
+    double sl2 = (1 / h) * q2((get_half_step_plus(i) + ksi) / 2) * (get_half_step_plus(i) - ksi);
+    return sl1 + sl2;
+} 
+double Solver::find_phi_rect(unsigned i) {
+    if (ksi >= get_half_step_plus(i)) {
+        return f1(get_x(i));
+    }
+    if (ksi <= get_half_step_minus(i)) {
+        return f2(get_x(i));
+    }
+
+    double sl1 = (1 / h) * f1((ksi + get_half_step_minus(i)) / 2) * (ksi - get_half_step_minus(i));
+    double sl2 = (1 / h) * f2((get_half_step_plus(i) + ksi) / 2) * (get_half_step_plus(i) - ksi);
+    return sl1 + sl2;
+}
+
+// Get parameters for tridiagonal matrix algorithm
+double Solver::get_A(unsigned i) {
+    return find_a_rect(i) / (h * h);
+}
+double Solver::get_B(unsigned i) {
+    return (find_a_rect(i) + find_a_rect(i + 1)) / (h * h) + find_d_rect(i);
+}
+double Solver::get_C(unsigned i) {
+    return find_a_rect(i + 1) / (h * h);
+}
+
+std::vector<double> Solver::SolveBVP(unsigned n) {
+    h = 1 / n;
+    std::vector<double> V(n + 1);
+
+    V[0] = mu1;
+    V[n] = mu2;
+
+    std::vector<double> alpha(n + 1);
+    alpha[1] = 0;
+    std::vector<double> beta(n + 1);
+    beta[1] = mu1;
+
+    // Forward pass
+    for (int i = 2; i <= n; i++) {
+        alpha[i] = get_B(i - 1) / (get_C(i - 1) - alpha[i - 1] * get_A(i - 1));
+        beta[i] = (find_phi_rect(i - 1) + get_A(i - 1) * beta[i - 1]) / (get_C(i - 1) - alpha[i - 1] * get_A(i - 1));
+    }
+
+    // Backward pass
+    for (int i = n - 1; i > 0; i--) {
+        V[i] = alpha[i + 1] * V[i + 1] + beta[i + 1];
+    }
+
+    return V;
+}
