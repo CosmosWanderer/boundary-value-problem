@@ -9,6 +9,14 @@ $f(x)$ - плотность источников (стоков тепла) в с
 $$\large \varphi_i = \frac{1}{h} \int_{x_{i-\frac{1}{2}}}^{x_{i+\frac{1}{2}}} f(x) \, dx, \quad i = 1,n-1$$
 $$\large d_i = \frac{1}{h} \int_{x_{i-\frac{1}{2}}}^{x_{i+\frac{1}{2}}} q(x) \, dx, \quad i = 1,n-1$$
 $$\large a_i = [\frac{1}{h} \int_{x_{i-1}}^{x_{i}} \frac{dx}{k(x)} \, ]^{-1}, \quad i = 1,n-1$$
+### Схема:
+$$ \large
+\begin{cases}
+V_o = \mu_0\\
+a_{i+1}\frac{V_{i+1} - V_{i}}{h^2} - a_i \frac{V_i - V_{i-1}}{h^2} - d_i V_i = -\varphi_i\\
+V_n = \mu_n
+\end{cases}
+$$
 
 ---
 ## Инструкция по сборке
