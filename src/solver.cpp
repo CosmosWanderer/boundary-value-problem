@@ -69,24 +69,24 @@ std::vector<double> Solver::SolveBVP(FuncType k1_, FuncType k2_,
     h = 1 / n;
     std::vector<double> V(n + 1);
 
-    // V[0] = mu1;
-    // V[n] = mu2;
+    V[0] = mu1;
+    V[n] = mu2;
 
-    // std::vector<double> alpha(n + 1);
-    // alpha[1] = 0;
-    // std::vector<double> beta(n + 1);
-    // beta[1] = mu1;
+    std::vector<double> alpha(n + 1);
+    alpha[1] = 0;
+    std::vector<double> beta(n + 1);
+    beta[1] = mu1;
 
-    // // Forward pass
-    // for (int i = 2; i <= n; i++) {
-    //     alpha[i] = get_B(i - 1) / (get_C(i - 1) - alpha[i - 1] * get_A(i - 1));
-    //     beta[i] = (find_phi_rect(i - 1) + get_A(i - 1) * beta[i - 1]) / (get_C(i - 1) - alpha[i - 1] * get_A(i - 1));
-    // }
+    // Forward pass
+    for (int i = 2; i <= n; i++) {
+        alpha[i] = get_B(i - 1) / (get_C(i - 1) - alpha[i - 1] * get_A(i - 1));
+        beta[i] = (find_phi_rect(i - 1) + get_A(i - 1) * beta[i - 1]) / (get_C(i - 1) - alpha[i - 1] * get_A(i - 1));
+    }
 
-    // // Backward pass
-    // for (int i = n - 1; i > 0; i--) {
-    //     V[i] = alpha[i + 1] * V[i + 1] + beta[i + 1];
-    // }
+    // Backward pass
+    for (int i = n - 1; i > 0; i--) {
+        V[i] = alpha[i + 1] * V[i + 1] + beta[i + 1];
+    }
 
     return V;
 }
