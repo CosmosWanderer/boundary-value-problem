@@ -65,8 +65,19 @@ double Solver::get_C(unsigned i) {
 
 std::vector<double> Solver::SolveBVP(FuncType k1_, FuncType k2_, 
                                      FuncType q1_, FuncType q2_, 
-                                     FuncType f1_, FuncType f2_, unsigned n) {
-    h = 1 / n;
+                                     FuncType f1_, FuncType f2_, 
+                                     double ksi_, unsigned n) 
+{
+    k1 = k1_;
+    k2 = k2;
+    q1 = q1_;
+    q2 = q2_;
+    f1 = f1_;
+    f2 = f2_;
+    
+    ksi = ksi_;
+
+    h = 1.0 / n;
     std::vector<double> V(n + 1);
 
     V[0] = mu1;
