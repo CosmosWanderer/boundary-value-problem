@@ -84,7 +84,7 @@ double Solver::get_C(unsigned i) {
 }
 
 std::vector<double> Solver::SolveBVP(unsigned n) {
-    h = 1 / n;
+    h = 1.0 / n;
     std::vector<double> V(n + 1);
 
     V[0] = mu1;
