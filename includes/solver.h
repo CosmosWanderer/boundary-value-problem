@@ -1,12 +1,18 @@
 #pragma once
 #include <vector>
 #include <tuple>
+#include <functional>
+
+#define M_PI 3.14159
+
+using FuncType = std::function<double(double)>;
 
 class Solver final
 {
-private:
+public:
     Solver() {}
 
+private:
     // Input
     double h = 1.0;
 
@@ -15,12 +21,7 @@ private:
     double mu1 = 0.0;
     double mu2 = 0.0;
 
-    double k1(double x);
-    double k2(double x);
-    double q1(double x);
-    double q2(double x);
-    double f1(double x);
-    double f2(double x);
+    FuncType k1, k2, q1, q2, f1, f2;
 
     // Get coords
     double get_x(unsigned i);
@@ -38,6 +39,8 @@ private:
     double get_C(unsigned i);
 
 public:
-    std::vector<double> SolveBVP(unsigned n);
+    std::vector<double> SolveBVP(   FuncType k1_, FuncType k2_, 
+                                    FuncType q1_, FuncType q2_, 
+                                    FuncType f1_, FuncType f2_, unsigned n);
 
 };

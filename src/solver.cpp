@@ -2,26 +2,6 @@
 #include <cmath>
 #include <numbers>
 
-// Main task, var 4
-double Solver::k1(double x) {
-    return (x + 1) * (x + 1);
-}
-double Solver::k2(double x) {
-    return x * x;
-}
-double Solver::q1(double x) {
-    return exp(-x) * sqrt(exp(1.0));
-}
-double Solver::q2(double x) {
-    return exp(x) / sqrt(exp(1.0));
-}
-double Solver::f1(double x) {
-    return cos(x * M_PI);
-}
-double Solver::f2(double x) {
-    return 1;
-}
-
 // Get coords
 double Solver::get_x(unsigned i) {
     return i * h;
@@ -83,28 +63,30 @@ double Solver::get_C(unsigned i) {
     return find_a_rect(i + 1) / (h * h);
 }
 
-std::vector<double> Solver::SolveBVP(unsigned n) {
+std::vector<double> Solver::SolveBVP(FuncType k1_, FuncType k2_, 
+                                     FuncType q1_, FuncType q2_, 
+                                     FuncType f1_, FuncType f2_, unsigned n) {
     h = 1 / n;
     std::vector<double> V(n + 1);
 
-    V[0] = mu1;
-    V[n] = mu2;
+    // V[0] = mu1;
+    // V[n] = mu2;
 
-    std::vector<double> alpha(n + 1);
-    alpha[1] = 0;
-    std::vector<double> beta(n + 1);
-    beta[1] = mu1;
+    // std::vector<double> alpha(n + 1);
+    // alpha[1] = 0;
+    // std::vector<double> beta(n + 1);
+    // beta[1] = mu1;
 
-    // Forward pass
-    for (int i = 2; i <= n; i++) {
-        alpha[i] = get_B(i - 1) / (get_C(i - 1) - alpha[i - 1] * get_A(i - 1));
-        beta[i] = (find_phi_rect(i - 1) + get_A(i - 1) * beta[i - 1]) / (get_C(i - 1) - alpha[i - 1] * get_A(i - 1));
-    }
+    // // Forward pass
+    // for (int i = 2; i <= n; i++) {
+    //     alpha[i] = get_B(i - 1) / (get_C(i - 1) - alpha[i - 1] * get_A(i - 1));
+    //     beta[i] = (find_phi_rect(i - 1) + get_A(i - 1) * beta[i - 1]) / (get_C(i - 1) - alpha[i - 1] * get_A(i - 1));
+    // }
 
-    // Backward pass
-    for (int i = n - 1; i > 0; i--) {
-        V[i] = alpha[i + 1] * V[i + 1] + beta[i + 1];
-    }
+    // // Backward pass
+    // for (int i = n - 1; i > 0; i--) {
+    //     V[i] = alpha[i + 1] * V[i + 1] + beta[i + 1];
+    // }
 
     return V;
 }
