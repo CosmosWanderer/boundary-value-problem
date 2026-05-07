@@ -69,7 +69,7 @@ std::vector<double> Solver::SolveBVP(FuncType k1_, FuncType k2_,
                                      double ksi_, unsigned n) 
 {
     k1 = k1_;
-    k2 = k2;
+    k2 = k2_;
     q1 = q1_;
     q2 = q2_;
     f1 = f1_;

@@ -105,6 +105,8 @@ if build_button:
                 v_vector = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, int(n))
                 control_vector = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, int(n) * 2)
             
+            print(v_vector)
+            
             error_eval_list = [abs(v_vector[i] - control_vector[i]) for i in range(n)]
             
             error = 0.0
@@ -191,37 +193,38 @@ if st.session_state.data is not None:
     # DATA
     # st.subheader("Таблица")
     
-    # # Display coefficients
-    # coef_data = []
-    # for i, (a, b, c, d) in enumerate(spline_data.coefs):
-    #     coef_data.append({
-    #         "i": i + 1,
-    #         "X i-1": spline_data.sample_x[i],
-    #         "X i": spline_data.sample_x[i + 1],
-    #         "a": f"{a:.4f}",
-    #         "b": f"{b:.4f}",
-    #         "c": f"{c:.4f}",
-    #         "d": f"{d:.4f}"
-    #     })
+    # # Table data
+    # if problem == "Тестовая":
+    #     table_data = []
+    #     for i in range(n):
+    #         table_data.append({
+    #             "N": i + 1,
+    #             "X i": 0.0 + i * (1 / n),
+    #             "C i": spline_data.sample_x[i + 1],
+    #             "a": f"{a:.4f}",
+    #             "b": f"{b:.4f}",
+    #             "c": f"{c:.4f}",
+    #             "d": f"{d:.4f}"
+    #         })
+            
+    #     column_config = {
+    #         "i": st.column_config.NumberColumn(
+    #             "i"
+    #         ),
+    #         "X i-1": st.column_config.NumberColumn(
+    #             "X i-1",
+    #             format="%.5f"
+    #         ),
+    #         "X i": st.column_config.NumberColumn(
+    #             "X i",
+    #             format="%.5f"
+    #         )
+    #     }
         
-    # column_config = {
-    #     "i": st.column_config.NumberColumn(
-    #         "i"
-    #     ),
-    #     "X i-1": st.column_config.NumberColumn(
-    #         "X i-1",
-    #         format="%.5f"
-    #     ),
-    #     "X i": st.column_config.NumberColumn(
-    #         "X i",
-    #         format="%.5f"
-    #     )
-    # }
-    
-    # for i in ["a", "b", "c", "d"]:
-    #     column_config[i] = st.column_config.NumberColumn(
-    #         i,
-    #         format="%.15f"
-    #     )
-    
-    # st.dataframe(coef_data, width='stretch', column_config=column_config)
+    #     for i in ["a", "b", "c", "d"]:
+    #         column_config[i] = st.column_config.NumberColumn(
+    #             i,
+    #             format="%.15f"
+    #         )
+        
+    #     st.dataframe(table_data, width='stretch', column_config=column_config)
