@@ -14,22 +14,22 @@ def test_analytical (x : float):
     return 0.0
 
 def test_k1 (x : float):
-    return 10.0
+    return 2.25
 
 def test_k2 (x : float):
-    return 0.0
+    return 0.25
 
 def test_q1 (x : float):
-    return 0.0
+    return 1.0
 
 def test_q2 (x : float):
-    return 0.0
+    return 0.367879
 
 def test_f1 (x : float):
-    return 0.0
+    return 6.12323e-17
 
 def test_f2 (x : float):
-    return 0.0
+    return 1.0
 
 
 # Main case
@@ -73,7 +73,7 @@ with st.sidebar:
     ("Тестовая", "Основная")
     )
     
-    n = st.number_input("Кол-во узлов (n)", value=5, min_value=2, step=1, key="n")
+    n = st.number_input("Кол-во узлов", value=5, min_value=2, step=1, key="n") - 1
     
     # Build button
     build_button = st.button("Решить", type="primary", width='stretch')
@@ -92,7 +92,8 @@ if build_button:
                 f2 = test_f2
                 
                 v_vector = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, int(n))
-                control_vector = [test_analytical(0.0 + i * (1 / n)) for i in range(n)]
+                control_vector = [test_analytical(0.0 + i * (1 / n)) for i in range(n + 1)]
+                control_graph = control_vector
             
             elif problem_select == "Основная":
                 k1 = main_k1
@@ -103,11 +104,10 @@ if build_button:
                 f2 = main_f2
                 
                 v_vector = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, int(n))
-                control_vector = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, int(n) * 2)
+                control_graph = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, int(n) * 2)
+                control_vector = control_graph[::2]
             
-            print(v_vector)
-            
-            error_eval_list = [abs(v_vector[i] - control_vector[i]) for i in range(n)]
+            error_eval_list = [abs(v_vector[i] - control_vector[i]) for i in range(n + 1)]
             
             error = 0.0
             max_error_x = 0.0
@@ -122,8 +122,10 @@ if build_button:
                 'n' : n,
                 'v_vector' : v_vector,
                 'control_vector' : control_vector,
+                'control_graph' : control_graph,
                 'error' : error,
-                'max_error_x' : max_error_x
+                'max_error_x' : max_error_x,
+                'error_eval_list' : error_eval_list
             }
             
         # except Exception as e:
@@ -137,21 +139,31 @@ if st.session_state.data is not None:
     n = data['n']
     v_vector = data['v_vector']
     control_vector = data['control_vector']
+    control_graph = data['control_graph']
     error = data['error']
     max_error_x = data['max_error_x']
+    error_eval_list = data['error_eval_list']
     
     # PLOT
     st.subheader("Графики")
     fig = graph.Figure()
     
-    # Spline
     fig.add_trace(graph.Scatter(
-        x=[0 + i * (1 / n) for i in range(n)], y=v_vector, 
+        x=[0 + i * (1 / (len(control_graph) - 1)) for i in range(len(control_graph))], y=control_graph, 
         mode='lines', 
-        name='S'
+        name= 'V2' if problem == "Основная" else 'U',
+        line=dict(color='rgb(75, 75, 255)')
+    ))
+    
+    fig.add_trace(graph.Scatter(
+        x=[0 + i * (1 / n) for i in range(n + 1)], y=v_vector, 
+        mode='lines', 
+        name='V',
+        line=dict(color='rgb(255, 255, 255)')
     ))
     
     fig.update_layout(
+        title="Решение",
         xaxis_title="X",
         yaxis_title="Y",
         hovermode='closest',
@@ -169,62 +181,121 @@ if st.session_state.data is not None:
     
     fig = graph.Figure()
     
+    fig.add_trace(graph.Scatter(
+        x=[0 + i * (1 / n) for i in range(n + 1)], y=[control_vector[i] - v_vector[i] for i in range(n + 1)], 
+        mode='lines', 
+        name='Error'
+    ))
+    
+    fig.update_layout(
+        title="Погрешность",
+        xaxis_title="X",
+        yaxis_title="Y",
+        hovermode='closest',
+        legend=dict(
+            yanchor="top",
+            y=1,
+            xanchor="left",
+            x=1.02,
+            bordercolor="black",
+            borderwidth=1
+        ),
+        yaxis=dict(
+            exponentformat='power', # Options: 'none', 'e', 'E', 'power', 'SI', 'B'
+            showexponent='all'      # Options: 'none', 'all', 'first', 'last'
+        )
+    )
+    
+    st.plotly_chart(fig, width='stretch')
+    
     # INFO
     st.subheader("Справка")
     
     if problem == "Тестовая":
-        st.info(f"""Для решения задачи использована равномерная сетка с
-                    числом разбиений n = «{n}»; 
-                    задача должна быть решена с погрешно-стью не более ε = 0.5⋅10 –6; 
-                    задача решена с погрешностью ε1 =«{error}»;
-                    максимальное отклонение аналитического и численного решений на-
-                    блюдается в точке x=«{max_error_x}»
-                """)
+        st.info(f"""Для решения задачи использована равномерная сетка с числом разбиений n = {n}; \n
+Задача должна быть решена с погрешностью не более ε = 0.5⋅10 –6; \n
+Задача решена с погрешностью ε1 = {error}; \n
+Максимальное отклонение аналитического и численного решений наблюдается в точке x = {max_error_x}.
+""")
         
     elif problem == "Основная":
-        st.info(f"""Для решения задачи использована равномерная сетка с
-                    числом разбиений n = «{n}»; 
-                    задача должна быть решена с погрешно-стью не более ε = 0.5⋅10 –6; 
-                    задача решена с погрешностью ε2 =«{error}»;
-                    максимальное отклонение аналитического и численного решений на-
-                    блюдается в точке x=«{max_error_x}»
-                """)
+        st.info(f"""Для решения задачи использована равномерная сетка с числом разбиений n = {n}; \n
+Задача должна быть решена с погрешностью не более ε = 0.5⋅10 –6; \n
+Задача решена с погрешностью ε2 = {error}; \n
+Максимальное отклонение аналитического и численного решений наблюдается в точке x = {max_error_x}.
+""")
     
     # DATA
-    # st.subheader("Таблица")
+    st.subheader("Таблица")
     
-    # # Table data
-    # if problem == "Тестовая":
-    #     table_data = []
-    #     for i in range(n):
-    #         table_data.append({
-    #             "N": i + 1,
-    #             "X i": 0.0 + i * (1 / n),
-    #             "C i": spline_data.sample_x[i + 1],
-    #             "a": f"{a:.4f}",
-    #             "b": f"{b:.4f}",
-    #             "c": f"{c:.4f}",
-    #             "d": f"{d:.4f}"
-    #         })
+    # Table data
+    if problem == "Тестовая":
+        table_data = []
+        for i in range(n + 1):
+            table_data.append({
+                "N": i,
+                "X_i": 0.0 + i * (1 / n),
+                "U_i": control_vector[i],
+                "V_i": v_vector[i],
+                "U_i - V_i": control_vector[i] - v_vector[i],
+            })
             
-    #     column_config = {
-    #         "i": st.column_config.NumberColumn(
-    #             "i"
-    #         ),
-    #         "X i-1": st.column_config.NumberColumn(
-    #             "X i-1",
-    #             format="%.5f"
-    #         ),
-    #         "X i": st.column_config.NumberColumn(
-    #             "X i",
-    #             format="%.5f"
-    #         )
-    #     }
+        column_config = {
+            "N": st.column_config.NumberColumn(
+                "N"
+            ),
+            "X_i": st.column_config.NumberColumn(
+                "X_i",
+                format="%.5f"
+            ),
+            "U_i": st.column_config.NumberColumn(
+                "U_i",
+                format="%.5f"
+            ),
+            "V_i": st.column_config.NumberColumn(
+                "V_i",
+                format="%.5f"
+            ),
+            "U_i - V_i": st.column_config.NumberColumn(
+                "U_i - V_i",
+                format="%.15f"
+            )
+        }
         
-    #     for i in ["a", "b", "c", "d"]:
-    #         column_config[i] = st.column_config.NumberColumn(
-    #             i,
-    #             format="%.15f"
-    #         )
+        st.dataframe(table_data, width='stretch', column_config=column_config)
         
-    #     st.dataframe(table_data, width='stretch', column_config=column_config)
+        
+    elif problem == "Основная":
+        table_data = []
+        for i in range(n + 1):
+            table_data.append({
+                "N": i,
+                "X_i": 0.0 + i * (1 / n),
+                "V_i": v_vector[i],
+                "V2_i": control_vector[i],
+                "V2_i - V_i": control_vector[i] - v_vector[i],
+            })
+            
+        column_config = {
+            "N": st.column_config.NumberColumn(
+                "N"
+            ),
+            "X_i": st.column_config.NumberColumn(
+                "X_i",
+                format="%.15f"
+            ),
+            "V_i": st.column_config.NumberColumn(
+                "V_i",
+                format="%.15f"
+            ),
+            "V2_i": st.column_config.NumberColumn(
+                "V2_i",
+                format="%.15f"
+            ),
+            "V2_i - V_i": st.column_config.NumberColumn(
+                "V2_i - V_i",
+                format="%.15f"
+            )
+        }
+        
+        st.dataframe(table_data, width='stretch', column_config=column_config)
