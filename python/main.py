@@ -5,10 +5,16 @@ from dataclasses import dataclass, field
 import streamlit as st
 import plotly.graph_objects as graph
 
+# General
+ksi = 0.5
+
 # Test case
 
-def test_k1 (x : float):
+def test_analytical (x : float):
     return 0.0
+
+def test_k1 (x : float):
+    return 10.0
 
 def test_k2 (x : float):
     return 0.0
@@ -84,6 +90,9 @@ if build_button:
                 q2 = test_q2
                 f1 = test_f1
                 f2 = test_f2
+                
+                v_vector = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, int(n))
+                control_vector = [test_analytical(0.0 + i * (1 / n)) for i in range(n)]
             
             elif problem_select == "Основная":
                 k1 = main_k1
@@ -93,13 +102,26 @@ if build_button:
                 f1 = main_f1
                 f2 = main_f2
                 
-            v_vector = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, int(n))
-            # error = error_eval(function, function_der, function_der_der, spline_data.coefs, spline_data.sample_x, num_control_nodes)
+                v_vector = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, int(n))
+                control_vector = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, int(n) * 2)
+            
+            error_eval_list = [abs(v_vector[i] - control_vector[i]) for i in range(n)]
+            
+            error = 0.0
+            max_error_x = 0.0
+            for i, e in enumerate(error_eval_list):
+                if e > error:
+                    error = e
+                    max_error_x = 0.0 + i * (1 / n)
             
             # Store in session state
             st.session_state.data = {
+                'problem' : problem_select,
                 'n' : n,
-                'v_vector' : v_vector
+                'v_vector' : v_vector,
+                'control_vector' : control_vector,
+                'error' : error,
+                'max_error_x' : max_error_x
             }
             
         # except Exception as e:
@@ -109,8 +131,12 @@ if build_button:
 # Display plot if data is available
 if st.session_state.data is not None:
     data = st.session_state.data
+    problem = data['problem']
     n = data['n']
     v_vector = data['v_vector']
+    control_vector = data['control_vector']
+    error = data['error']
+    max_error_x = data['max_error_x']
     
     # PLOT
     st.subheader("Графики")
@@ -141,22 +167,28 @@ if st.session_state.data is not None:
     
     fig = graph.Figure()
     
-    # st.subheader("Справка")
+    # INFO
+    st.subheader("Справка")
     
-    # st.info(f"Сетка сплайна: {len(spline_data.sample_x)}")
-    # st.info(f"Контрольная сетка: {len(error_data.x)}")
+    if problem == "Тестовая":
+        st.info(f"""Для решения задачи использована равномерная сетка с
+                    числом разбиений n = «{n}»; 
+                    задача должна быть решена с погрешно-стью не более ε = 0.5⋅10 –6; 
+                    задача решена с погрешностью ε1 =«{error}»;
+                    максимальное отклонение аналитического и численного решений на-
+                    блюдается в точке x=«{max_error_x}»
+                """)
+        
+    elif problem == "Основная":
+        st.info(f"""Для решения задачи использована равномерная сетка с
+                    числом разбиений n = «{n}»; 
+                    задача должна быть решена с погрешно-стью не более ε = 0.5⋅10 –6; 
+                    задача решена с погрешностью ε2 =«{error}»;
+                    максимальное отклонение аналитического и численного решений на-
+                    блюдается в точке x=«{max_error_x}»
+                """)
     
-    # st.info(f"Погрешность сплайна на контрольной сетке: \
-    #         { max([abs(error_data.spline_y[i] - error_data.sample_y[i]) for i in range(len(error_data.x))])} \
-    #         ")
-    # st.info(f"Погрешность производной на контрольной сетке: \
-    #     { max([abs(error_data.spline_der_y[i] - error_data.sample_der_y[i]) for i in range(len(error_data.x))])} \
-    #         ")
-    # st.info(f"Погрешность второй производной на контрольной сетке: \
-    #     { max([abs(error_data.spline_der_der_y[i] - error_data.sample_der_der_y[i]) for i in range(len(error_data.x))])} \
-    #         ")
-    
-    # # DATA
+    # DATA
     # st.subheader("Таблица")
     
     # # Display coefficients
@@ -192,80 +224,4 @@ if st.session_state.data is not None:
     #         format="%.15f"
     #     )
     
-    # st.dataframe(coef_data, width='stretch')
-    
-    # st.subheader("Погрешность")
-    
-    # fig = graph.Figure()
-    
-    # # Spline der der
-    # fig.add_trace(graph.Scatter(
-    #     x=error_data.x, y=[error_data.spline_y[i] - error_data.sample_y[i] for i in range(len(error_data.x))], 
-    #     mode='lines', 
-    #     name="F - S"
-    # ))
-    
-    # fig.add_trace(graph.Scatter(
-    #     x=error_data.x, y=[error_data.spline_der_y[i] - error_data.sample_der_y[i] for i in range(len(error_data.x))], 
-    #     mode='lines', 
-    #     name="F' - S'"
-    # ))
-        
-    # fig.add_trace(graph.Scatter(
-    #     x=error_data.x, y=[error_data.spline_der_der_y[i] - error_data.sample_der_der_y[i] for i in range(len(error_data.x))], 
-    #     mode='lines', 
-    #     name="F'' - S''"
-    # ))
-    
-    # fig.update_layout(
-    #     xaxis_title="X",
-    #     yaxis_title="Y",
-    #     hovermode='closest',
-    #     legend=dict(
-    #         yanchor="top",
-    #         y=1,
-    #         xanchor="left",
-    #         x=1.02,
-    #         bordercolor="black",
-    #         borderwidth=1
-    #     )
-    # )
-    
-    # st.plotly_chart(fig, width='stretch')
-    
-    # # Display coefficients
-    # error_eval_data = []
-    # for i, x in enumerate(error_data.x):
-    #     error_eval_data.append({
-    #         "j": i,
-    #         "X j": x,
-    #         "F(Xj)": error_data.sample_y[i],
-    #         "S(Xj)": error_data.spline_y[i],
-    #         "F(Xj) - S(Xj)": error_data.sample_y[i] - error_data.spline_y[i],
-            
-    #         "F'(Xj)": error_data.sample_der_y[i],
-    #         "S'(Xj)": error_data.spline_der_y[i],
-    #         "F'(Xj) - S'(Xj)": error_data.sample_der_y[i] - error_data.spline_der_y[i],
-            
-    #         "F''(Xj)": error_data.sample_der_der_y[i],
-    #         "S''(Xj)": error_data.spline_der_der_y[i],
-    #         "F''(Xj) - S''(Xj)": error_data.sample_der_der_y[i] - error_data.spline_der_der_y[i],
-    #     })
-        
-    # column_config = {
-    #     "j": st.column_config.NumberColumn(
-    #         "j"
-    #     ),
-    #     "X j": st.column_config.NumberColumn(
-    #         "X j",
-    #         format="%.5f"
-    #     )
-    # }
-    
-    # for i in ["F(Xj)", "S(Xj)", "F(Xj) - S(Xj)", "F'(Xj)", "S'(Xj)", "F'(Xj) - S'(Xj)", "F''(Xj)", "S''(Xj)", "F''(Xj) - S''(Xj)"]:
-    #     column_config[i] = st.column_config.NumberColumn(
-    #         i,
-    #         format="%.15f"
-    #     )
-    
-    # st.dataframe(error_eval_data, width='stretch', column_config=column_config)
+    # st.dataframe(coef_data, width='stretch', column_config=column_config)
