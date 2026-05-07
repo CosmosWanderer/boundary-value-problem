@@ -24,7 +24,7 @@ double Solver::find_a_rect(unsigned i) {
     
     double sl1 = (ksi - get_x(i-1)) / (k1((get_x(i-1) + ksi) / 2));
     double sl2 = (get_x(i) - ksi) / (k2((get_x(i) + ksi) / 2));
-    return sl1 + sl2;
+    return h / (sl1 + sl2);
 
 }
 double Solver::find_d_rect(unsigned i) {
@@ -57,11 +57,12 @@ double Solver::get_A(unsigned i) {
     return find_a_rect(i) / (h * h);
 }
 double Solver::get_B(unsigned i) {
-    return (find_a_rect(i) + find_a_rect(i + 1)) / (h * h) + find_d_rect(i);
-}
-double Solver::get_C(unsigned i) {
     return find_a_rect(i + 1) / (h * h);
 }
+double Solver::get_C(unsigned i) {
+    return (find_a_rect(i) + find_a_rect(i + 1)) / (h * h) + find_d_rect(i);
+}
+
 
 std::vector<double> Solver::SolveBVP(FuncType k1_, FuncType k2_, 
                                      FuncType q1_, FuncType q2_, 
