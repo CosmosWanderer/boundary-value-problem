@@ -43,5 +43,9 @@ public:
                                     FuncType q1_, FuncType q2_, 
                                     FuncType f1_, FuncType f2_, 
                                     double ksi_, unsigned n);
+    std::vector<double> SolveBVPMixedTestFunction(   FuncType k1_, FuncType k2_, 
+                                    FuncType q1_, FuncType q2_, 
+                                    FuncType f1_, FuncType f2_, 
+                                    double ksi_, unsigned n);
 
 };

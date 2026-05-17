@@ -129,7 +129,7 @@ if build_button:
                 f1 = test_f1
                 f2 = test_f2
                 
-                v_vector = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, int(n))
+                v_vector = boundarysolver.solve_bvp_mixed_test_function(k1, k2, q1, q2, f1, f2, ksi, int(n))
                 control_vector = [test_analytical_mixed(0.0 + i * (1 / n)) for i in range(n + 1)]
                 control_graph = control_vector
             
