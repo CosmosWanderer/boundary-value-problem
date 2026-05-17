@@ -122,11 +122,10 @@ std::vector<double> Solver::SolveBVPMixedTestFunction(FuncType k1_, FuncType k2_
     theta_2 = theta_2_;
     
     ksi = ksi_;
-
     h = 1.0 / n;
     std::vector<double> V(n + 1);
 
-    double kappa_1 = -k1(0.0) / (h * (gamma_1 + k1(0.0) * 1 / h));
+    double kappa_1 = k1(0.0) / (h * (gamma_1 + k1(0.0) * 1 / h));
     double kappa_2 = k2(1.0) / (h * (gamma_2 + k2(1.0) * 1 / h));
     mu1 = gamma_1 * theta_1 / (gamma_1 + k1(0.0) * 1 / h);
     mu2 = gamma_2 * theta_2 / (gamma_2 + k2(1.0) * 1 / h);
