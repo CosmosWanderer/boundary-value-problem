@@ -2,26 +2,6 @@
 #include <cmath>
 #include <numbers>
 
-// Main task, var 4
-double Solver::k1(double x) {
-    return (x + 1) * (x + 1);
-}
-double Solver::k2(double x) {
-    return x * x;
-}
-double Solver::q1(double x) {
-    return exp(-x) * sqrt(exp(1.0));
-}
-double Solver::q2(double x) {
-    return exp(x) / sqrt(exp(1.0));
-}
-double Solver::f1(double x) {
-    return cos(x * M_PI);
-}
-double Solver::f2(double x) {
-    return 1;
-}
-
 // Get coords
 double Solver::get_x(unsigned i) {
     return i * h;
@@ -44,7 +24,7 @@ double Solver::find_a_rect(unsigned i) {
     
     double sl1 = (ksi - get_x(i-1)) / (k1((get_x(i-1) + ksi) / 2));
     double sl2 = (get_x(i) - ksi) / (k2((get_x(i) + ksi) / 2));
-    return sl1 + sl2;
+    return h / (sl1 + sl2);
 
 }
 double Solver::find_d_rect(unsigned i) {
@@ -77,14 +57,28 @@ double Solver::get_A(unsigned i) {
     return find_a_rect(i) / (h * h);
 }
 double Solver::get_B(unsigned i) {
-    return (find_a_rect(i) + find_a_rect(i + 1)) / (h * h) + find_d_rect(i);
-}
-double Solver::get_C(unsigned i) {
     return find_a_rect(i + 1) / (h * h);
 }
+double Solver::get_C(unsigned i) {
+    return (find_a_rect(i) + find_a_rect(i + 1)) / (h * h) + find_d_rect(i);
+}
 
-std::vector<double> Solver::SolveBVP(unsigned n) {
-    h = 1 / n;
+
+std::vector<double> Solver::SolveBVP(FuncType k1_, FuncType k2_, 
+                                     FuncType q1_, FuncType q2_, 
+                                     FuncType f1_, FuncType f2_, 
+                                     double ksi_, unsigned n) 
+{
+    k1 = k1_;
+    k2 = k2_;
+    q1 = q1_;
+    q2 = q2_;
+    f1 = f1_;
+    f2 = f2_;
+    
+    ksi = ksi_;
+
+    h = 1.0 / n;
     std::vector<double> V(n + 1);
 
     V[0] = mu1;
