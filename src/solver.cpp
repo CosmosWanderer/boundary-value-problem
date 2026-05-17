@@ -2,26 +2,6 @@
 #include <cmath>
 #include <numbers>
 
-// Main task, var 4
-double Solver::k1(double x) {
-    return (x + 1) * (x + 1);
-}
-double Solver::k2(double x) {
-    return x * x;
-}
-double Solver::q1(double x) {
-    return exp(-x) * sqrt(exp(1.0));
-}
-double Solver::q2(double x) {
-    return exp(x) / sqrt(exp(1.0));
-}
-double Solver::f1(double x) {
-    return cos(x * M_PI);
-}
-double Solver::f2(double x) {
-    return 1;
-}
-
 // Get coords
 double Solver::get_x(unsigned i) {
     return i * h;
@@ -44,7 +24,7 @@ double Solver::find_a_rect(unsigned i) {
     
     double sl1 = (ksi - get_x(i-1)) / (k1((get_x(i-1) + ksi) / 2));
     double sl2 = (get_x(i) - ksi) / (k2((get_x(i) + ksi) / 2));
-    return sl1 + sl2;
+    return h / (sl1 + sl2);
 
 }
 double Solver::find_d_rect(unsigned i) {
@@ -77,14 +57,28 @@ double Solver::get_A(unsigned i) {
     return find_a_rect(i) / (h * h);
 }
 double Solver::get_B(unsigned i) {
-    return (find_a_rect(i) + find_a_rect(i + 1)) / (h * h) + find_d_rect(i);
-}
-double Solver::get_C(unsigned i) {
     return find_a_rect(i + 1) / (h * h);
 }
+double Solver::get_C(unsigned i) {
+    return (find_a_rect(i) + find_a_rect(i + 1)) / (h * h) + find_d_rect(i);
+}
 
-std::vector<double> Solver::SolveBVP(unsigned n) {
-    h = 1 / n;
+
+std::vector<double> Solver::SolveBVP(FuncType k1_, FuncType k2_, 
+                                     FuncType q1_, FuncType q2_, 
+                                     FuncType f1_, FuncType f2_, 
+                                     double ksi_, unsigned n) 
+{
+    k1 = k1_;
+    k2 = k2_;
+    q1 = q1_;
+    q2 = q2_;
+    f1 = f1_;
+    f2 = f2_;
+    
+    ksi = ksi_;
+
+    h = 1.0 / n;
     std::vector<double> V(n + 1);
 
     V[0] = mu1;
@@ -103,6 +97,56 @@ std::vector<double> Solver::SolveBVP(unsigned n) {
 
     // Backward pass
     for (int i = n - 1; i > 0; i--) {
+        V[i] = alpha[i + 1] * V[i + 1] + beta[i + 1];
+    }
+
+    return V;
+}
+
+std::vector<double> Solver::SolveBVPMixedTestFunction(FuncType k1_, FuncType k2_, 
+                                     FuncType q1_, FuncType q2_, 
+                                     FuncType f1_, FuncType f2_, 
+                                     double ksi_, unsigned n,
+                                     double gamma_1_, double gamma_2_,
+                                     double theta_1_, double theta_2_) 
+{
+    k1 = k1_;
+    k2 = k2_;
+    q1 = q1_;
+    q2 = q2_;
+    f1 = f1_;
+    f2 = f2_;
+    gamma_1 = gamma_1_;
+    gamma_2 = gamma_2_;
+    theta_1 = theta_1_;
+    theta_2 = theta_2_;
+    
+    ksi = ksi_;
+    h = 1.0 / n;
+    std::vector<double> V(n + 1);
+
+    double kappa_1 = k1(0.0) / (h * (gamma_1 + k1(0.0) * 1 / h));
+    double kappa_2 = k2(1.0) / (h * (gamma_2 + k2(1.0) * 1 / h));
+    mu1 = gamma_1 * theta_1 / (gamma_1 + k1(0.0) * 1 / h);
+    mu2 = gamma_2 * theta_2 / (gamma_2 + k2(1.0) * 1 / h);
+
+    V[0] = mu1;
+
+    std::vector<double> alpha(n + 1);
+    alpha[1] = kappa_1;
+    std::vector<double> beta(n + 1);
+    beta[1] = mu1;
+
+    // Forward pass
+    for (int i = 2; i <= n; i++) {
+        alpha[i] = get_B(i - 1) / (get_C(i - 1) - alpha[i - 1] * get_A(i - 1));
+        beta[i] = (find_phi_rect(i - 1) + get_A(i - 1) * beta[i - 1]) / (get_C(i - 1) - alpha[i - 1] * get_A(i - 1));
+    }
+
+    V[n] = (mu2 + kappa_2 * beta[n]) / (1 - alpha[n] * kappa_2);
+
+    // Backward pass
+    for (int i = n - 1; i >= 0; i--) {
         V[i] = alpha[i + 1] * V[i + 1] + beta[i + 1];
     }
 
