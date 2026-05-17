@@ -106,7 +106,9 @@ std::vector<double> Solver::SolveBVP(FuncType k1_, FuncType k2_,
 std::vector<double> Solver::SolveBVPMixedTestFunction(FuncType k1_, FuncType k2_, 
                                      FuncType q1_, FuncType q2_, 
                                      FuncType f1_, FuncType f2_, 
-                                     double ksi_, unsigned n) 
+                                     double ksi_, unsigned n,
+                                     double gamma_1_, double gamma_2_,
+                                     double theta_1_, double theta_2_) 
 {
     k1 = k1_;
     k2 = k2_;
@@ -114,17 +116,25 @@ std::vector<double> Solver::SolveBVPMixedTestFunction(FuncType k1_, FuncType k2_
     q2 = q2_;
     f1 = f1_;
     f2 = f2_;
+    gamma_1 = gamma_1_;
+    gamma_2 = gamma_2_;
+    theta_1 = theta_1_;
+    theta_2 = theta_2_;
     
     ksi = ksi_;
 
     h = 1.0 / n;
     std::vector<double> V(n + 1);
 
+    double kappa_1 = -k1(0.0) / (h * (gamma_1 + k1(0.0) * 1 / h));
+    double kappa_2 = k2(1.0) / (h * (gamma_2 + k2(1.0) * 1 / h));
+    mu1 = gamma_1 * theta_1 / (gamma_1 + k1(0.0) * 1 / h);
+    mu2 = gamma_2 * theta_2 / (gamma_2 + k2(1.0) * 1 / h);
+
     V[0] = mu1;
-    V[n] = mu2;
 
     std::vector<double> alpha(n + 1);
-    alpha[1] = 0;
+    alpha[1] = kappa_1;
     std::vector<double> beta(n + 1);
     beta[1] = mu1;
 
@@ -134,8 +144,10 @@ std::vector<double> Solver::SolveBVPMixedTestFunction(FuncType k1_, FuncType k2_
         beta[i] = (find_phi_rect(i - 1) + get_A(i - 1) * beta[i - 1]) / (get_C(i - 1) - alpha[i - 1] * get_A(i - 1));
     }
 
+    V[n] = (mu2 + kappa_2 * beta[n]) / (1 - alpha[n] * kappa_2);
+
     // Backward pass
-    for (int i = n - 1; i > 0; i--) {
+    for (int i = n - 1; i >= 0; i--) {
         V[i] = alpha[i + 1] * V[i + 1] + beta[i + 1];
     }
 

@@ -6,9 +6,13 @@ import streamlit as st
 import plotly.graph_objects as graph
 
 # General
-ksi = 0.5
+ksi = math.pi / 4.0
 
 # Test case
+GAMMA1 = 4
+GAMMA2 = 3
+THETA1 = 2
+THETA2 = 1
 
 def test_analytical (x : float):
     return 0.0 # заглушка
@@ -129,7 +133,7 @@ if build_button:
                 f1 = test_f1
                 f2 = test_f2
                 
-                v_vector = boundarysolver.solve_bvp_mixed_test_function(k1, k2, q1, q2, f1, f2, ksi, int(n))
+                v_vector = boundarysolver.solve_bvp_mixed_test_function(k1, k2, q1, q2, f1, f2, ksi, int(n), GAMMA1, GAMMA2, THETA1, THETA2)
                 control_vector = [test_analytical_mixed(0.0 + i * (1 / n)) for i in range(n + 1)]
                 control_graph = control_vector
             
