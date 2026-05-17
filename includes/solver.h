@@ -17,9 +17,13 @@ private:
     double h = 1.0;
 
     // Main task, var 4
-    double ksi = 0.5;
+    double ksi = M_PI / 4.0;
     double mu1 = 0.0;
     double mu2 = 0.0;
+
+    // Tets task
+    double gamma_1, gamma_2;
+    double theta_1, theta_2;
 
     FuncType k1, k2, q1, q2, f1, f2;
 
@@ -43,5 +47,11 @@ public:
                                     FuncType q1_, FuncType q2_, 
                                     FuncType f1_, FuncType f2_, 
                                     double ksi_, unsigned n);
+    std::vector<double> SolveBVPMixedTestFunction(FuncType k1_, FuncType k2_, 
+                                     FuncType q1_, FuncType q2_, 
+                                     FuncType f1_, FuncType f2_, 
+                                     double ksi_, unsigned n,
+                                     double gamma_1_, double gamma_2_,
+                                     double theta_1_, double theta_2_);
 
 };
