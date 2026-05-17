@@ -11,25 +11,32 @@ ksi = 0.5
 # Test case
 
 def test_analytical (x : float):
-    return 0.0
+    C1 = -0.176770
+    C2 = 0.707598
+    C3 = -0.141992
+    C4 = 0.533268
+    if x <= math.pi / 4:
+        return C1 * math.exp( math.sqrt(math.pi) / 2 * x ) + C2 * math.exp( -math.sqrt(math.pi) / 2 * x ) + 4 / math.pi
+    else:
+        return C3 * math.exp( math.pi /(4 * math.sqrt(2)) * x) + C4 * math.exp( -math.pi /(4 * math.sqrt(2)) * x) + 8 * math.sqrt(2) / math.pi**2
 
 def test_k1 (x : float):
-    return 2.25
+    return 1
 
 def test_k2 (x : float):
-    return 0.25
+    return 2
 
 def test_q1 (x : float):
-    return 1.0
+    return math.pi / 4
 
 def test_q2 (x : float):
-    return 0.367879
+    return math.pi ** 2 / 16
 
 def test_f1 (x : float):
-    return 6.12323e-17
+    return 1
 
 def test_f2 (x : float):
-    return 1.0
+    return math.sqrt(2) / 2
 
 
 # Main case
@@ -70,7 +77,11 @@ with st.sidebar:
     # Input parameters
     problem_select = st.selectbox(
     "Выберите задачу",
-    ("Тестовая", "Основная")
+    (
+        "первая краевая тестовая задача",
+        "первая краевая основная задача",
+        "смешанная краевая тестовая задача, классич. аппрокс. ГУ",
+        "смешанная краевая основная задача, улучш. аппрокс. ГУ")
     )
     
     n = st.number_input("Кол-во узлов", value=5, min_value=2, step=1, key="n") - 1
@@ -83,7 +94,7 @@ with st.sidebar:
 if build_button:
     with st.spinner("Вычисляем..."):
         # try:
-            if problem_select == "Тестовая":
+            if problem_select == "первая краевая тестовая задача":
                 k1 = test_k1
                 k2 = test_k2
                 q1 = test_q1
@@ -95,7 +106,7 @@ if build_button:
                 control_vector = [test_analytical(0.0 + i * (1 / n)) for i in range(n + 1)]
                 control_graph = control_vector
             
-            elif problem_select == "Основная":
+            elif problem_select == "первая краевая основная задача":
                 k1 = main_k1
                 k2 = main_k2
                 q1 = main_q1
@@ -151,7 +162,7 @@ if st.session_state.data is not None:
     fig.add_trace(graph.Scatter(
         x=[0 + i * (1 / (len(control_graph) - 1)) for i in range(len(control_graph))], y=control_graph, 
         mode='lines', 
-        name= 'V2' if problem == "Основная" else 'U',
+        name= 'V2' if problem == "первая краевая основная задача" else 'U',
         line=dict(color='rgb(75, 75, 255)')
     ))
     
@@ -211,14 +222,14 @@ if st.session_state.data is not None:
     # INFO
     st.subheader("Справка")
     
-    if problem == "Тестовая":
+    if problem == "первая краевая тестовая задача":
         st.info(f"""Для решения задачи использована равномерная сетка с числом разбиений n = {n}; \n
 Задача должна быть решена с погрешностью не более ε = 0.5⋅10 –6; \n
 Задача решена с погрешностью ε1 = {error}; \n
 Максимальное отклонение аналитического и численного решений наблюдается в точке x = {max_error_x}.
 """)
         
-    elif problem == "Основная":
+    elif problem == "первая краевая основная задача":
         st.info(f"""Для решения задачи использована равномерная сетка с числом разбиений n = {n}; \n
 Задача должна быть решена с погрешностью не более ε = 0.5⋅10 –6; \n
 Задача решена с погрешностью ε2 = {error}; \n
@@ -229,7 +240,7 @@ if st.session_state.data is not None:
     st.subheader("Таблица")
     
     # Table data
-    if problem == "Тестовая":
+    if problem == "первая краевая тестовая задача":
         table_data = []
         for i in range(n + 1):
             table_data.append({
@@ -265,7 +276,7 @@ if st.session_state.data is not None:
         st.dataframe(table_data, width='stretch', column_config=column_config)
         
         
-    elif problem == "Основная":
+    elif problem == "первая краевая основная задача":
         table_data = []
         for i in range(n + 1):
             table_data.append({
