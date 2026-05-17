@@ -23,7 +23,6 @@ std::vector<double> pySolveMixedTestFunction(FuncType k1_, FuncType k2_,
 {
     Solver solver;
     return solver.SolveBVPMixedTestFunction(k1_, k2_, q1_, q2_, f1_, f2_, ksi_, n, gamma_1_, gamma_2_, theta_1_, theta_2_);
-    return solver.SolveBVPMixedTestFunction(k1_, k2_, q1_, q2_, f1_, f2_, ksi_, n, gamma_1_, gamma_2_, theta_1_, theta_2_);
 }
 
 // Create the pybind11 module

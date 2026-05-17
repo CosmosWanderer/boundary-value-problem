@@ -25,7 +25,7 @@ def test_analytical_mixed (x : float):
     if x <= math.pi / 4:
         return C1 * math.exp( math.sqrt(math.pi) / 2 * x ) + C2 * math.exp( -math.sqrt(math.pi) / 2 * x ) + 4 / math.pi
     else:
-        return C3 * math.exp( math.pi /(4 * math.sqrt(2)) * x) + C4 * math.exp( -math.pi /(4 * math.sqrt(2)) * x) + 8 * math.sqrt(2) / math.pi**2
+        return C3 * math.exp( math.pi /(4 * math.sqrt(2)) * x) + C4 * math.exp( -math.pi /(4 * math.sqrt(2)) * x) + 8 * math.sqrt(2) / (math.pi**2)
 
 def test_k1 (x : float):
     return 1
@@ -37,7 +37,7 @@ def test_q1 (x : float):
     return math.pi / 4
 
 def test_q2 (x : float):
-    return math.pi ** 2 / 16
+    return math.pi * math.pi / 16
 
 def test_f1 (x : float):
     return 1
