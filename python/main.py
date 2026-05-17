@@ -11,6 +11,9 @@ ksi = 0.5
 # Test case
 
 def test_analytical (x : float):
+    return 0.0 # заглушка
+
+def test_analytical_mixed (x : float):
     C1 = -0.176770
     C2 = 0.707598
     C3 = -0.141992
@@ -117,6 +120,18 @@ if build_button:
                 v_vector = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, int(n))
                 control_graph = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, int(n) * 2)
                 control_vector = control_graph[::2]
+
+            elif problem_select == "смешанная краевая тестовая задача, классич. аппрокс. ГУ":
+                k1 = test_k1
+                k2 = test_k2
+                q1 = test_q1
+                q2 = test_q2
+                f1 = test_f1
+                f2 = test_f2
+                
+                v_vector = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, int(n))
+                control_vector = [test_analytical_mixed(0.0 + i * (1 / n)) for i in range(n + 1)]
+                control_graph = control_vector
             
             error_eval_list = [abs(v_vector[i] - control_vector[i]) for i in range(n + 1)]
             
