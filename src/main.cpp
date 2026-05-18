@@ -54,8 +54,8 @@ PYBIND11_MODULE(boundarysolver, m) {
         pybind11::arg("q1_func"), pybind11::arg("q2_func"),
         pybind11::arg("f1_func"), pybind11::arg("f2_func"),
         pybind11::arg("ksi"), pybind11::arg("n"),
-        pybind11::arg("gamma_1_"), pybind11::arg("gamma_2_"),
-        pybind11::arg("theta_1_"), pybind11::arg("theta_2_")
+        pybind11::arg("gamma_1"), pybind11::arg("gamma_2"),
+        pybind11::arg("theta_1"), pybind11::arg("theta_2")
     );
 
     m.def("solve_bvp_mixed_advanced_approximation", &pySolveMixedAdvancedApproximation,
@@ -63,7 +63,7 @@ PYBIND11_MODULE(boundarysolver, m) {
         pybind11::arg("q1_func"), pybind11::arg("q2_func"),
         pybind11::arg("f1_func"), pybind11::arg("f2_func"),
         pybind11::arg("ksi"), pybind11::arg("n"),
-        pybind11::arg("gamma_1_"), pybind11::arg("gamma_2_"),
-        pybind11::arg("theta_1_"), pybind11::arg("theta_2_")
+        pybind11::arg("gamma_1"), pybind11::arg("gamma_2"),
+        pybind11::arg("theta_1"), pybind11::arg("theta_2")
     );
 }
