@@ -15,11 +15,10 @@ public:
 private:
     // Input
     double h = 1.0;
+    unsigned n = 0;
 
     // Main task, var 4
     double ksi = M_PI / 4.0;
-    double mu1 = 0.0;
-    double mu2 = 0.0;
 
     // Tets task
     double gamma_1, gamma_2;
@@ -46,12 +45,21 @@ public:
     std::vector<double> SolveBVP(   FuncType k1_, FuncType k2_, 
                                     FuncType q1_, FuncType q2_, 
                                     FuncType f1_, FuncType f2_, 
-                                    double ksi_, unsigned n);
+                                    double ksi_, double mu1, double mu2, 
+                                    unsigned n_);
+
     std::vector<double> SolveBVPMixedTestFunction(FuncType k1_, FuncType k2_, 
                                      FuncType q1_, FuncType q2_, 
                                      FuncType f1_, FuncType f2_, 
-                                     double ksi_, unsigned n,
+                                     double ksi_, unsigned n_,
                                      double gamma_1_, double gamma_2_,
                                      double theta_1_, double theta_2_);
+
+    std::vector<double> SolveBVPMixedAdvancedApproximation( FuncType k1_, FuncType k2_, 
+                                                            FuncType q1_, FuncType q2_, 
+                                                            FuncType f1_, FuncType f2_, 
+                                                            double ksi_, unsigned n_,
+                                                            double gamma_1_, double gamma_2_,
+                                                            double theta_1_, double theta_2_);
 
 };

@@ -8,11 +8,15 @@ import plotly.graph_objects as graph
 # General
 ksi = math.pi / 4.0
 
-# Test case
-GAMMA1 = 4
-GAMMA2 = 3
-THETA1 = 2
-THETA2 = 1
+# 1-st boundary conditions
+mu1 = 0.0
+mu2 = 0.0
+
+# 3-rd boundary conditions
+gamma1 = 4
+gamma2 = 3
+theta1 = 2
+theta2 = 1
 
 def test_analytical (x : float):
     return 0.0 # заглушка
@@ -49,22 +53,23 @@ def test_f2 (x : float):
 # Main case
 
 def main_k1 (x : float) -> float:
-    return (x + 1) * (x + 1)
+    return math.sqrt(2) * math.cos(x)
 
 def main_k2 (x : float) -> float:
-    return x * x
+    return 2
 
 def main_q1 (x : float) -> float:
-    return math.exp(-x) * math.sqrt(math.exp(1.0))
+    return x
 
 def main_q2 (x : float) -> float:
-    return math.exp(x) / math.sqrt(math.exp(1.0))
+    return x * x
 
 def main_f1 (x : float) -> float:
-    return math.cos(x * math.pi)
+    return math.sin(2 * x)
 
 def main_f2 (x : float) -> float:
-    return 1
+    return math.sin(x)
+
 
 
 # STREAM LIT
@@ -85,10 +90,10 @@ with st.sidebar:
     problem_select = st.selectbox(
     "Выберите задачу",
     (
-        "первая краевая тестовая задача",
-        "первая краевая основная задача",
-        "смешанная краевая тестовая задача, классич. аппрокс. ГУ",
-        "смешанная краевая основная задача, улучш. аппрокс. ГУ")
+        "Первая тестовая",
+        "Первая основная",
+        "Смешанная тестовая, классич. аппрокс. ГУ",
+        "Смешанная основная, улучш. аппрокс. ГУ")
     )
     
     n = st.number_input("Кол-во узлов", value=5, min_value=2, step=1, key="n") - 1
@@ -99,9 +104,16 @@ with st.sidebar:
 
 # Build button press event
 if build_button:
+    
+    problem_id = [  "Первая тестовая",
+                    "Первая основная",
+                    "Смешанная тестовая, классич. аппрокс. ГУ",
+                    "Смешанная основная, улучш. аппрокс. ГУ"
+                 ].index(problem_select)
+    
     with st.spinner("Вычисляем..."):
         # try:
-            if problem_select == "первая краевая тестовая задача":
+            if problem_id == 0:
                 k1 = test_k1
                 k2 = test_k2
                 q1 = test_q1
@@ -109,11 +121,11 @@ if build_button:
                 f1 = test_f1
                 f2 = test_f2
                 
-                v_vector = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, int(n))
+                v_vector = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, mu1, mu2, int(n))
                 control_vector = [test_analytical(0.0 + i * (1 / n)) for i in range(n + 1)]
                 control_graph = control_vector
             
-            elif problem_select == "первая краевая основная задача":
+            elif problem_id == 1:
                 k1 = main_k1
                 k2 = main_k2
                 q1 = main_q1
@@ -121,11 +133,11 @@ if build_button:
                 f1 = main_f1
                 f2 = main_f2
                 
-                v_vector = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, int(n))
-                control_graph = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, int(n) * 2)
+                v_vector = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, mu1, mu2, int(n))
+                control_graph = boundarysolver.solve_bvp(k1, k2, q1, q2, f1, f2, ksi, mu1, mu2, int(n) * 2)
                 control_vector = control_graph[::2]
 
-            elif problem_select == "смешанная краевая тестовая задача, классич. аппрокс. ГУ":
+            elif problem_id == 2:
                 k1 = test_k1
                 k2 = test_k2
                 q1 = test_q1
@@ -133,9 +145,21 @@ if build_button:
                 f1 = test_f1
                 f2 = test_f2
                 
-                v_vector = boundarysolver.solve_bvp_mixed_test_function(k1, k2, q1, q2, f1, f2, ksi, int(n), GAMMA1, GAMMA2, THETA1, THETA2)
+                v_vector = boundarysolver.solve_bvp_mixed_test_function(k1, k2, q1, q2, f1, f2, ksi, int(n), gamma1, gamma2, theta1, theta2)
                 control_vector = [test_analytical_mixed(0.0 + i * (1 / n)) for i in range(n + 1)]
                 control_graph = control_vector
+                
+            elif problem_id == 3:
+                k1 = main_k1
+                k2 = main_k2
+                q1 = main_q1
+                q2 = main_q2
+                f1 = main_f1
+                f2 = main_f2
+                
+                v_vector = boundarysolver.solve_bvp_mixed_advanced_approximation(k1, k2, q1, q2, f1, f2, ksi, int(n), gamma1, gamma2, theta1, theta2)
+                control_graph = boundarysolver.solve_bvp_mixed_advanced_approximation(k1, k2, q1, q2, f1, f2, ksi, int(n) * 2, gamma1, gamma2, theta1, theta2)
+                control_vector = control_graph[::2]
             
             error_eval_list = [abs(v_vector[i] - control_vector[i]) for i in range(n + 1)]
             
@@ -148,7 +172,7 @@ if build_button:
             
             # Store in session state
             st.session_state.data = {
-                'problem' : problem_select,
+                'problem' : problem_id,
                 'n' : n,
                 'v_vector' : v_vector,
                 'control_vector' : control_vector,
@@ -181,7 +205,7 @@ if st.session_state.data is not None:
     fig.add_trace(graph.Scatter(
         x=[0 + i * (1 / (len(control_graph) - 1)) for i in range(len(control_graph))], y=control_graph, 
         mode='lines', 
-        name= 'V2' if problem == "первая краевая основная задача" else 'U',
+        name= 'V2' if (problem == 1 or problem == 3) else 'U',
         line=dict(color='rgb(75, 75, 255)')
     ))
     
@@ -241,24 +265,31 @@ if st.session_state.data is not None:
     # INFO
     st.subheader("Справка")
     
-    if problem == "первая краевая тестовая задача":
+    if problem == 0:
         st.info(f"""Для решения задачи использована равномерная сетка с числом разбиений n = {n}; \n
-Задача должна быть решена с погрешностью не более ε = 0.5⋅10 –6; \n
+Задача должна быть решена с погрешностью не более ε = 0.5⋅10^(–6); \n
 Задача решена с погрешностью ε1 = {error}; \n
 Максимальное отклонение аналитического и численного решений наблюдается в точке x = {max_error_x}.
 """)
         
-    elif problem == "первая краевая основная задача":
+    elif problem == 1:
         st.info(f"""Для решения задачи использована равномерная сетка с числом разбиений n = {n}; \n
-Задача должна быть решена с погрешностью не более ε = 0.5⋅10 –6; \n
+Задача должна быть решена с погрешностью не более ε = 0.5⋅10^(–6); \n
 Задача решена с погрешностью ε2 = {error}; \n
 Максимальное отклонение аналитического и численного решений наблюдается в точке x = {max_error_x}.
 """)
     
-    elif problem == "смешанная краевая тестовая задача, классич. аппрокс. ГУ":
+    elif problem == 2:
         st.info(f"""Для решения задачи использована равномерная сетка с числом разбиений n = {n}; \n
-Задача должна быть решена с погрешностью не более ε = 0.5⋅10 –6; \n
-Задача решена с погрешностью ε1 = {error}; \n
+Задача должна быть решена с погрешностью не более ε = 0.5⋅10^(–6); \n
+Задача решена с погрешностью ε3 = {error}; \n
+Максимальное отклонение аналитического и численного решений наблюдается в точке x = {max_error_x}.
+""")
+        
+    elif problem == 3:
+        st.info(f"""Для решения задачи использована равномерная сетка с числом разбиений n = {n}; \n
+Задача должна быть решена с погрешностью не более ε = 0.5⋅10^(–6); \n
+Задача решена с погрешностью ε4 = {error}; \n
 Максимальное отклонение аналитического и численного решений наблюдается в точке x = {max_error_x}.
 """)
     
@@ -266,7 +297,7 @@ if st.session_state.data is not None:
     st.subheader("Таблица")
     
     # Table data
-    if problem == "первая краевая тестовая задача":
+    if problem == 0 or problem == 2:
         table_data = []
         for i in range(n + 1):
             table_data.append({
@@ -302,7 +333,7 @@ if st.session_state.data is not None:
         st.dataframe(table_data, width='stretch', column_config=column_config)
         
         
-    elif problem == "первая краевая основная задача":
+    elif problem == 1 or problem == 3:
         table_data = []
         for i in range(n + 1):
             table_data.append({
@@ -331,41 +362,6 @@ if st.session_state.data is not None:
             ),
             "V2_i - V_i": st.column_config.NumberColumn(
                 "V2_i - V_i",
-                format="%.15f"
-            )
-        }
-        
-        st.dataframe(table_data, width='stretch', column_config=column_config)
-    
-    elif problem == "смешанная краевая тестовая задача, классич. аппрокс. ГУ":
-        table_data = []
-        for i in range(n + 1):
-            table_data.append({
-                "N": i,
-                "X_i": 0.0 + i * (1 / n),
-                "U_i": control_vector[i],
-                "V_i": v_vector[i],
-                "U_i - V_i": control_vector[i] - v_vector[i],
-            })
-            
-        column_config = {
-            "N": st.column_config.NumberColumn(
-                "N"
-            ),
-            "X_i": st.column_config.NumberColumn(
-                "X_i",
-                format="%.5f"
-            ),
-            "U_i": st.column_config.NumberColumn(
-                "U_i",
-                format="%.5f"
-            ),
-            "V_i": st.column_config.NumberColumn(
-                "V_i",
-                format="%.5f"
-            ),
-            "U_i - V_i": st.column_config.NumberColumn(
-                "U_i - V_i",
                 format="%.15f"
             )
         }
