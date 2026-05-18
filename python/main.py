@@ -255,6 +255,13 @@ if st.session_state.data is not None:
 Максимальное отклонение аналитического и численного решений наблюдается в точке x = {max_error_x}.
 """)
     
+    elif problem == "смешанная краевая тестовая задача, классич. аппрокс. ГУ":
+        st.info(f"""Для решения задачи использована равномерная сетка с числом разбиений n = {n}; \n
+Задача должна быть решена с погрешностью не более ε = 0.5⋅10 –6; \n
+Задача решена с погрешностью ε1 = {error}; \n
+Максимальное отклонение аналитического и численного решений наблюдается в точке x = {max_error_x}.
+""")
+    
     # DATA
     st.subheader("Таблица")
     
@@ -324,6 +331,41 @@ if st.session_state.data is not None:
             ),
             "V2_i - V_i": st.column_config.NumberColumn(
                 "V2_i - V_i",
+                format="%.15f"
+            )
+        }
+        
+        st.dataframe(table_data, width='stretch', column_config=column_config)
+    
+    elif problem == "смешанная краевая тестовая задача, классич. аппрокс. ГУ":
+        table_data = []
+        for i in range(n + 1):
+            table_data.append({
+                "N": i,
+                "X_i": 0.0 + i * (1 / n),
+                "U_i": control_vector[i],
+                "V_i": v_vector[i],
+                "U_i - V_i": control_vector[i] - v_vector[i],
+            })
+            
+        column_config = {
+            "N": st.column_config.NumberColumn(
+                "N"
+            ),
+            "X_i": st.column_config.NumberColumn(
+                "X_i",
+                format="%.5f"
+            ),
+            "U_i": st.column_config.NumberColumn(
+                "U_i",
+                format="%.5f"
+            ),
+            "V_i": st.column_config.NumberColumn(
+                "V_i",
+                format="%.5f"
+            ),
+            "U_i - V_i": st.column_config.NumberColumn(
+                "U_i - V_i",
                 format="%.15f"
             )
         }
