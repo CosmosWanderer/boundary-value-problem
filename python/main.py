@@ -9,8 +9,8 @@ import plotly.graph_objects as graph
 ksi = math.pi / 4.0
 
 # 1-st boundary conditions
-mu1 = 0.0
-mu2 = 0.0
+mu1 = 1.0
+mu2 = 1.0
 
 # 3-rd boundary conditions
 gamma1 = 4
@@ -19,6 +19,17 @@ theta1 = 2
 theta2 = 1
 
 def test_analytical (x : float):
+    C1 = -0.0853501
+    C2 = -0.187889
+    C3 = -0.0645856
+    C4 = -0.0588503
+    if x <= math.pi / 4:
+        return C1 * math.exp( math.sqrt(math.pi) / 2 * x ) + C2 * math.exp( -math.sqrt(math.pi) / 2 * x ) + 4 / math.pi
+    else:
+        return C3 * math.exp( math.pi /(4 * math.sqrt(2)) * x) + C4 * math.exp( -math.pi /(4 * math.sqrt(2)) * x) + 8 * math.sqrt(2) / (math.pi**2)
+
+# a≈-0.0853501, b≈-0.187889, c≈-0.0645856, m≈-0.0588503
+# a≈-0.0853454, b≈-0.187894, c≈-0.0645846, m≈-0.0588535
     return 0.0 # заглушка
 
 def test_analytical_mixed (x : float):
