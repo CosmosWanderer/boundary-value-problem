@@ -36,10 +36,10 @@ def test_analytical (x : float):
     return 0.0 # заглушка
 
 def test_analytical_mixed (x : float):
-    C1 = -0.176770
-    C2 = 0.707598
-    C3 = -0.141992
-    C4 = 0.533268
+    C1 = -0.176774252211327515384539708536
+    C2 = 0.707596429846089100634421763213
+    C3 = -0.141990852316821238186197161784
+    C4 = 0.533259614047196784427201838631
     if x <= math.pi / 4:
         return C1 * math.exp( math.sqrt(math.pi) / 2 * x ) + C2 * math.exp( -math.sqrt(math.pi) / 2 * x ) + 4 / math.pi
     else:
