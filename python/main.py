@@ -19,17 +19,20 @@ theta1 = 2
 theta2 = 1
 
 def test_analytical (x : float):
-    C1 = -0.0853501
-    C2 = -0.187889
-    C3 = -0.0645856
-    C4 = -0.0588503
+    # C1 = -0.0853501
+    # C2 = -0.187889
+    # C3 = -0.0645856
+    # C4 = -0.0588503
+
+    C1 = -0.08535083927882967402475657078 
+    C2 = -0.18788870545633301212631353620 
+    C3 = -0.06458646809488448523163634662 
+    C4 = -0.058849982371126825225901092585
+
     if x <= math.pi / 4:
         return C1 * math.exp( math.sqrt(math.pi) / 2 * x ) + C2 * math.exp( -math.sqrt(math.pi) / 2 * x ) + 4 / math.pi
     else:
         return C3 * math.exp( math.pi /(4 * math.sqrt(2)) * x) + C4 * math.exp( -math.pi /(4 * math.sqrt(2)) * x) + 8 * math.sqrt(2) / (math.pi**2)
-
-# a≈-0.0853501, b≈-0.187889, c≈-0.0645856, m≈-0.0588503
-# a≈-0.0853454, b≈-0.187894, c≈-0.0645846, m≈-0.0588535
     return 0.0 # заглушка
 
 def test_analytical_mixed (x : float):
